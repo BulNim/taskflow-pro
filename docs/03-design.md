@@ -14,3 +14,14 @@
 ## 의존성 추가 정책
 
 이 문서에 사유를 적기 전에는 어떤 의존성도 도입할 수 없다.
+
+## 의존성 도입 기록
+
+| 패키지 | 사유 |
+|---|---|
+| fastapi | 1번 항목(백엔드 - FastAPI) 실행에 필요한 프레임워크 본체 |
+| uvicorn[standard] | FastAPI 앱을 구동하는 ASGI 서버 |
+| sqlalchemy | 3번 항목(DB - SQLite, SQLAlchemy ORM) 명시된 ORM |
+| pytest | 02-specs.md·05-conventions.md에 명시된 테스트 도구 |
+| httpx | FastAPI `TestClient`가 내부적으로 사용하는 HTTP 클라이언트, pytest 테스트 작성에 필요 |
+| python-dotenv | 05-conventions.md의 "비밀번호 하드코딩 금지 → .env + os.getenv" 대안을 구현하기 위한 `.env` 로더 (fastapi 설치 시 함께 딸려온 부수 패키지, 실제 사용 시 근거로 확정) |

@@ -1,0 +1,8 @@
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/*.db
+backend/uvicorn.log
+**/__pycache__/
+*.pyc
+.env
