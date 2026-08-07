@@ -44,4 +44,5 @@
 | 추가 | 폼 (title / due_at / status) | 입력 후 제출 시 `POST /api/tasks` 호출 |
 | 목록 | 카드 (status 배지 + D-N HH:MM 표시) | `GET /api/tasks` 결과를 카드 목록으로 렌더링 |
 | 수정 | 카드 클릭 → 모달 (전 필드 수정 가능) | 모달에서 전 필드 전송, `PUT /api/tasks/{id}` 호출 |
+| 상태 변경 (인라인) | 카드 안 status 배지를 드롭다운으로 클릭 | 선택 즉시 `GET /api/tasks/{id}`로 현재 값 조회 후 status만 교체해 `PUT /api/tasks/{id}` 호출. 모달을 열지 않으며 클릭 이벤트가 카드(모달 오픈)로 전파되지 않아야 한다 |
 | 삭제 | 휴지통 아이콘 → 확인 | 확인 후 `DELETE /api/tasks/{id}` 호출 |

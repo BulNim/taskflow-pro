@@ -59,7 +59,11 @@ function renderTaskCard(task) {
     <div class="flex flex-col gap-1 flex-1">
       <div class="flex items-center gap-2">
         <span class="font-medium">${escapeHtml(task.title)}</span>
-        <span class="text-xs rounded-xl px-2 py-0.5 ${statusBadgeClass[task.status]}">${task.status}</span>
+        <select class="statusSelect text-xs rounded-xl px-2 py-0.5 border-0 cursor-pointer ${statusBadgeClass[task.status]}">
+          <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>todo</option>
+          <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>in_progress</option>
+          <option value="done" ${task.status === 'done' ? 'selected' : ''}>done</option>
+        </select>
       </div>
       ${dueLabel ? `<span class="text-sm text-gray-500 dark:text-gray-400">${dueLabel}</span>` : ''}
     </div>
@@ -69,6 +73,13 @@ function renderTaskCard(task) {
   card.querySelector('.deleteBtn').addEventListener('click', (e) => {
     e.stopPropagation();
     handleDeleteTask(task.id);
+  });
+
+  const statusSelect = card.querySelector('.statusSelect');
+  statusSelect.addEventListener('click', (e) => e.stopPropagation());
+  statusSelect.addEventListener('change', (e) => {
+    e.stopPropagation();
+    handleInlineStatusChange(task.id, statusSelect.value);
   });
 
   card.addEventListener('click', () => openEditModal(task.id));
@@ -155,6 +166,27 @@ async function handleUpdateTask(event) {
   });
 
   closeEditModal();
+  await fetchTaskList();
+}
+
+async function handleInlineStatusChange(taskId, newStatus) {
+  const response = await fetch(`/api/tasks/${taskId}`);
+  if (!response.ok) return;
+  const task = await response.json();
+
+  const payload = {
+    title: task.title,
+    description: task.description,
+    status: newStatus,
+    due_at: task.due_at,
+  };
+
+  await fetch(`/api/tasks/${taskId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
   await fetchTaskList();
 }
 
