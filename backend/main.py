@@ -1,8 +1,10 @@
+from pathlib import Path
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 import models
@@ -68,3 +70,8 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(db_task)
     db.commit()
     return Response(status_code=204)
+
+
+# 프론트엔드(index.html, app.js)를 백엔드와 동일 origin에서 서빙해 상대경로 fetch(/api/...)가 동작하게 함
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
