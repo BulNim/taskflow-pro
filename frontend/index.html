@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 다크모드 설정은 Tailwind CDN 로드 뒤에 둔다 (05-conventions 구현 규칙 4) -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            system: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Apple SD Gothic Neo', 'sans-serif']
+          }
+        }
+      }
+    };
+    // 초기 테마: localStorage 우선, 없으면 prefers-color-scheme (03-design 8)
+    (function () {
+      var saved = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+</head>
+<body class="font-system min-h-screen bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+  <div class="mx-auto max-w-3xl px-4 py-6">
+
+    <header class="mb-6 flex items-center justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold">TaskFlow Pro</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400">팀 업무를 한눈에</p>
+      </div>
+      <button id="themeToggle" type="button"
+        class="rounded-xl bg-white/70 px-3 py-2 text-sm shadow-lg backdrop-blur transition hover:bg-white dark:bg-slate-800/70 dark:hover:bg-slate-800">
+        <span id="themeIcon">🌙</span>
+      </button>
+    </header>
+
+    <!-- 추가 폼 - title / due_at / status (02-specs 화면 명세) -->
+    <section class="mb-6 rounded-xl bg-white/70 p-4 shadow-lg backdrop-blur dark:bg-slate-800/70">
+      <form id="createForm" class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+        <input id="createTitle" name="title" type="text" required maxlength="200" placeholder="할 일 제목"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-900 sm:col-span-2" />
+        <input id="createDueAt" name="due_at" type="datetime-local"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-900" />
+        <select id="createStatus" name="status"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-900">
+          <option value="todo">할 일</option>
+          <option value="in_progress">진행 중</option>
+          <option value="done">완료</option>
+        </select>
+        <button type="submit"
+          class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-medium text-white shadow-lg transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white sm:col-span-4">
+          추가
+        </button>
+      </form>
+      <p id="createError" class="mt-2 hidden text-sm text-red-500"></p>
+    </section>
+
+    <!-- 목록 카드 -->
+    <section>
+      <div id="taskList" class="grid grid-cols-1 gap-3"></div>
+      <p id="emptyState" class="hidden rounded-xl bg-white/60 p-6 text-center text-sm text-slate-500 shadow-lg backdrop-blur dark:bg-slate-800/60 dark:text-slate-400">
+        아직 등록된 작업이 없습니다.
+      </p>
+    </section>
+  </div>
+
+  <!-- 수정 모달 - 카드 클릭으로 열리고 전 필드를 수정한다 -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 p-4 backdrop-blur">
+    <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-lg dark:bg-slate-800">
+      <h2 class="mb-4 text-lg font-semibold">작업 수정</h2>
+      <form id="editForm" class="grid grid-cols-1 gap-3">
+        <input type="hidden" id="editId" />
+        <label class="text-sm">제목
+          <input id="editTitle" type="text" required maxlength="200"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" />
+        </label>
+        <label class="text-sm">설명
+          <textarea id="editDescription" rows="3"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"></textarea>
+        </label>
+        <label class="text-sm">마감
+          <input id="editDueAt" type="datetime-local"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" />
+        </label>
+        <label class="text-sm">상태
+          <select id="editStatus"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+            <option value="todo">할 일</option>
+            <option value="in_progress">진행 중</option>
+            <option value="done">완료</option>
+          </select>
+        </label>
+        <p id="editError" class="hidden text-sm text-red-500"></p>
+        <div class="mt-2 flex justify-end gap-2">
+          <button type="button" id="editCancel"
+            class="rounded-xl px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">취소</button>
+          <button type="submit"
+            class="rounded-xl bg-slate-800 px-4 py-2 text-sm text-white shadow-lg hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
