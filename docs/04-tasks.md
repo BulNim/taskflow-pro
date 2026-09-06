@@ -29,16 +29,16 @@ MVP 를 3개 Phase 로 진행한다.
 
 | # | 단계 | 검증 방법 | 완료 |
 |---|---|---|---|
-| 1 | backend 폴더와 가상환경 | `backend/.venv` 생성, 활성화 확인 | [ ] |
-| 2 | 의존성 설치 (fastapi / uvicorn / sqlalchemy / pytest / httpx - httpx 는 TestClient 구동에 필요하므로 03-design 정책에 따라 미리 승인) | `pip list` 에 5개 모두 | [ ] |
-| 3 | SQLAlchemy 모델 | 필드 7개가 02-specs 순서·타입과 일치 | [ ] |
-| 4 | Pydantic 스키마 extra=forbid | 스펙 외 필드 요청이 422 | [ ] |
-| 5 | DB 초기화 | `tasks` 테이블 생성 확인 | [ ] |
-| 6 | POST 와 GET 목록 | 201 / 200, 목록에 description 없음 | [ ] |
-| 7 | GET 단건 | 200, description 포함 | [ ] |
-| 8 | PUT 과 DELETE | 200 / 204 | [ ] |
-| 9 | pytest 정상·400·404 | `pytest` 전건 통과 | [ ] |
-| 10 | Swagger 확인 | `http://127.0.0.1:8000/docs` 에 엔드포인트 5개 | [ ] |
+| 1 | backend 폴더와 가상환경 | `backend/.venv` 생성, 활성화 확인 | [x] |
+| 2 | 의존성 설치 (fastapi / uvicorn / sqlalchemy / pytest / httpx - httpx 는 TestClient 구동에 필요하므로 03-design 정책에 따라 미리 승인) | `pip list` 에 5개 모두 | [x] |
+| 3 | SQLAlchemy 모델 | 필드 7개가 02-specs 순서·타입과 일치 | [x] |
+| 4 | Pydantic 스키마 extra=forbid | 스펙 외 필드 요청이 422 | [x] |
+| 5 | DB 초기화 | `tasks` 테이블 생성 확인 | [x] |
+| 6 | POST 와 GET 목록 | 201 / 200, 목록에 description 없음 | [x] |
+| 7 | GET 단건 | 200, description 포함 | [x] |
+| 8 | PUT 과 DELETE | 200 / 204 | [x] |
+| 9 | pytest 정상·400·404 | `pytest` 전건 통과 | [x] |
+| 10 | Swagger 확인 | `http://127.0.0.1:8000/docs` 에 엔드포인트 5개 | [x] |
 
 ## Phase 3 (프론트) - 8단계
 
